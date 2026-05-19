@@ -1,4 +1,5 @@
 import flet as ft
+from flet_core import MainAxisAlignment
 
 
 class View(ft.UserControl):
@@ -13,34 +14,46 @@ class View(ft.UserControl):
         self._controller = None
         # graphical elements
         self._title = None
-        self.txt_name = None
-        self.btn_hello = None
+        self._ddSelezioneCorso = None #inizializzo tutti gli elementi nel costruttore
+        self._btnCercaIscritti = None
+        self._txtInMatricola = None
+        self._txtInNome = None
+        self._txtInCognome = None
+        self._btnCercaStudente = None
+        self._btnCercaCorsi = None
+        self._btnIscrivi = None
         self.txt_result = None
-        self.txt_container = None
+
 
     def load_interface(self):
         """Function that loads the graphical elements of the view"""
         # title
-        self._title = ft.Text("Hello World", color="blue", size=24)
+        self._title = ft.Text("App Gestione Studenti", color="blue", size=24)
         self._page.controls.append(self._title)
 
-        #ROW with some controls
-        # text field for the name
-        self.txt_name = ft.TextField(
-            label="name",
-            width=200,
-            hint_text="Insert a your name"
-        )
-
-        # button for the "hello" reply
-        self.btn_hello = ft.ElevatedButton(text="Hello", on_click=self._controller.handle_hello)
-        row1 = ft.Row([self.txt_name, self.btn_hello],
-                      alignment=ft.MainAxisAlignment.CENTER)
-        self._page.controls.append(row1)
+        #ROW1
+        self._ddSelezioneCorso = ft.Dropdown(label="Selezionare un corso",options=self._controller.popolamento_corsi_dd()) #metto solo la label perchè dovrà essere popolata con il DAO
+        self._btnCercaIscritti = ft.ElevatedButton(text="Cerca Iscritti", on_click=self._controller.handleCercaIscritti)
+        row1 = ft.Row([ft.Container(self._ddSelezioneCorso, width=500), ft.Container(self._btnCercaIscritti, width=250)],
+                      alignment=MainAxisAlignment.CENTER)
+        #ROW2
+        self._txtInMatricola = ft.TextField(label="matricola")
+        self._txtInNome = ft.TextField(label="nome", read_only = True) #il testo diceva di inserire che non sono editabili
+        self._txtInCognome = ft.TextField(label="cognome", read_only=True) #il testo diceva di inserire che non sono editabili
+        row2 = ft.Row(
+            [ft.Container(self._txtInMatricola, width=250), ft.Container(self._txtInNome, width=250), ft.Container(self._txtInCognome, width=250)],
+        alignment=MainAxisAlignment.CENTER)
+        #ROW3
+        self._btnCercaStudente = ft.ElevatedButton(text="Cerca Studente", on_click=self._controller.handleCercaStudente)
+        self._btnCercaCorsi = ft.ElevatedButton(text="Cerca Corsi", on_click=self._controller.handleCercaCorsi)
+        self._btnIscrivi = ft.ElevatedButton(text="Iscrivi", on_click=self._controller.handleIscrivi)
+        row3 = ft.Row(
+            [ft.Container(self._btnCercaStudente, width=250), ft.Container(self._btnCercaCorsi, width=250),
+             ft.Container(self._btnIscrivi, width=250)], alignment=MainAxisAlignment.CENTER)
 
         # List View where the reply is printed
         self.txt_result = ft.ListView(expand=1, spacing=10, padding=20, auto_scroll=True)
-        self._page.controls.append(self.txt_result)
+        self._page.add(row1,row2, row3, self.txt_result)
         self._page.update()
 
     @property
